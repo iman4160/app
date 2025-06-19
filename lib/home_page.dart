@@ -15,9 +15,10 @@ class _HomePageState extends State<HomePage> {
   late Timer _timer;
 
   // Define the custom colors for the rectangles, consistent with the Sign In page
-  final Color primaryGreen = Color(0xFF1b9349);
-  final Color accentBlue = Color(0xFF3753a2);
+  final Color primaryGreen = const Color(0xFF1b9349);
+  final Color accentBlue = const Color(0xFF3753a2);
   final Color textColor = Colors.white; // For text on dark backgrounds
+  final Color iconColor = Colors.white; // Color for the icons
 
   @override
   void initState() {
@@ -59,34 +60,43 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  // Widget to create a single dashboard rectangle
-  Widget _buildDashboardRectangle(String title, Color color) {
+  // Widget to create a single dashboard rectangle with an icon
+  Widget _buildDashboardRectangle(String title, IconData icon, Color color) {
     return Container(
-      width: double.infinity, // Full width
-      margin: const EdgeInsets.symmetric(vertical: 10), // Vertical spacing between rectangles
-      padding: const EdgeInsets.all(20), // Padding inside the rectangle
+      padding: const EdgeInsets.all(15), // Padding inside the rectangle
       decoration: BoxDecoration(
         color: color, // The specified color for this rectangle
         borderRadius: BorderRadius.circular(15), // Rounded corners
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withOpacity(0.3), // Slightly darker shadow
             spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3), // Subtle shadow
+            blurRadius: 7,
+            offset: const Offset(0, 4), // More pronounced shadow
           ),
         ],
       ),
-      child: Center(
-        child: Text(
-          title,
-          style: TextStyle(
-            color: textColor, // White text for contrast
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+        children: [
+          Icon(
+            icon,
+            color: iconColor, // White icon color
+            size: 40, // Larger icon size
           ),
-          textAlign: TextAlign.center,
-        ),
+          const SizedBox(height: 10), // Spacing between icon and text
+          Text(
+            title,
+            style: TextStyle(
+              color: textColor, // White text for contrast
+              fontSize: 18, // Slightly smaller font for grid items
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2, // Allow text to wrap to two lines if needed
+            overflow: TextOverflow.ellipsis, // Add ellipsis if text overflows
+          ),
+        ],
       ),
     );
   }
@@ -137,17 +147,26 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch rectangles horizontally
-          children: <Widget>[
-            // First Rectangle: Total Verifications (Green)
-            _buildDashboardRectangle('Total Verifications', primaryGreen),
-            // Second Rectangle: New Customers Onboarded (Blue)
-            _buildDashboardRectangle('New Customers Onboarded', accentBlue),
-            // Third Rectangle: Pending Verifications (Green)
-            _buildDashboardRectangle('Pending Verifications', primaryGreen),
-            // Fourth Rectangle: Avg. Processing Time (Blue)
-            _buildDashboardRectangle('Avg. Processing Time', accentBlue),
+        child: Column( // Use a Column to hold the GridView and any other widgets below it
+          children: [
+            GridView.count(
+              shrinkWrap: true, // Important: allows GridView to take only needed space
+              physics: const NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
+              crossAxisCount: 2, // Two columns
+              crossAxisSpacing: 15, // Spacing between columns
+              mainAxisSpacing: 15, // Spacing between rows
+              childAspectRatio: 1.0, // Make the children square (width/height ratio)
+              children: <Widget>[
+                // First Rectangle: Total Verifications (Green)
+                _buildDashboardRectangle('Total Verifications', Icons.check_circle_outline, primaryGreen),
+                // Second Rectangle: New Customers Onboarded (Blue)
+                _buildDashboardRectangle('New Customers Onboarded', Icons.person_add_alt_1, accentBlue),
+                // Third Rectangle: Pending Verifications (Green)
+                _buildDashboardRectangle('Pending Verifications', Icons.hourglass_empty, accentBlue),
+                // Fourth Rectangle: Avg. Processing Time (Blue)
+                _buildDashboardRectangle('Avg. Processing Time', Icons.timer, primaryGreen),
+              ],
+            ),
             const SizedBox(height: 20), // Space before the button
           ],
         ),
