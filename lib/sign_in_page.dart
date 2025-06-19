@@ -78,15 +78,7 @@ class _SignInPageState extends State<SignInPage> {
     final bool isSignInButtonEnabled = _isEmailValid && _isPasswordNotEmpty;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Sign In',
-          style: TextStyle(color: textColor),
-        ),
-        backgroundColor: accentBlue,
-        centerTitle: true,
-        elevation: 0,
-      ),
+      // The AppBar has been removed from here
       backgroundColor: Colors.black,
 
       body: SingleChildScrollView(

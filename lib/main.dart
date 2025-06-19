@@ -23,6 +23,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       // title: A one-line description of the app for the device's task switcher.
       title: 'Flutter Sign In Demo',
+      // Set this to false to remove the debug banner from the top right corner
+      debugShowCheckedModeBanner: false,
 
       // theme: Defines the visual properties of the Material Design widgets
       // in your app. Here, we set the primary color and visual density.

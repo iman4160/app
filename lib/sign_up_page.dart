@@ -13,8 +13,8 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _confirmPasswordVisible = false;
 
   // Define the custom colors, consistent with the other pages
-  final Color primaryGreen = Color(0xFF1b9349);
-  final Color accentBlue = Color(0xFF3753a2);
+  final Color primaryGreen = const Color(0xFF1b9349);
+  final Color accentBlue = const Color(0xFF3753a2);
   final Color textColor = Colors.white;
   final Color hintColor = Colors.white70;
   final Color inputFillColor = Colors.white.withOpacity(0.1);
@@ -30,21 +30,13 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black, // Dark background
-      appBar: AppBar(
-        title: Text(
-          'Sign Up',
-          style: TextStyle(color: textColor),
-        ),
-        backgroundColor: accentBlue, // Accent blue for app bar
-        centerTitle: true,
-        elevation: 0,
-      ),
+      // The AppBar has been removed from here
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const SizedBox(height: 40),
+            const SizedBox(height: 40), // Add space at the top since AppBar is removed
 
             // App Icon or Logo
             Icon(
