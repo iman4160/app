@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async'; // Required for Timer
-import 'package:newproject/profile_page.dart'; // Import the new Profile Page
+import 'package:newproject/profile_page.dart'; // Import the Profile Page
+import 'package:newproject/customers_screen.dart'; // Import the Customers Screen
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,10 +16,9 @@ class _HomePageState extends State<HomePage> {
   late Timer _timer;
 
   // Define the custom colors for the rectangles, consistent with the Sign In page
-  final Color primaryGreen = const Color(0xFF1b9349);
-  final Color accentBlue = const Color(0xFF3753a2);
+  final Color primaryGreen = Color(0xFF1b9349);
+  final Color accentBlue = Color(0xFF3753a2);
   final Color textColor = Colors.white; // For text on dark backgrounds
-  final Color iconColor = Colors.white; // Color for the icons
 
   @override
   void initState() {
@@ -60,31 +60,32 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  // Widget to create a single dashboard rectangle with an icon
-  Widget _buildDashboardRectangle(String title, IconData icon, Color color) {
+  // Widget to create a single dashboard grid item (modified to include an icon)
+  Widget _buildDashboardGridItem(String title, Color color, IconData icon) {
     return Container(
-      padding: const EdgeInsets.all(15), // Padding inside the rectangle
+      margin: const EdgeInsets.all(8), // Margin around each grid item
+      padding: const EdgeInsets.all(16), // Padding inside the item
       decoration: BoxDecoration(
-        color: color, // The specified color for this rectangle
+        color: color, // The specified color for this item
         borderRadius: BorderRadius.circular(15), // Rounded corners
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3), // Slightly darker shadow
+            color: Colors.black.withOpacity(0.2),
             spreadRadius: 2,
-            blurRadius: 7,
-            offset: const Offset(0, 4), // More pronounced shadow
+            blurRadius: 5,
+            offset: const Offset(0, 3), // Subtle shadow
           ),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+      child: Column( // Use a Column to stack icon and text vertically
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             icon,
-            color: iconColor, // White icon color
-            size: 40, // Larger icon size
+            size: 40, // Size for the icon
+            color: textColor, // White icon for contrast
           ),
-          const SizedBox(height: 10), // Spacing between icon and text
+          const SizedBox(height: 8), // Space between icon and text
           Text(
             title,
             style: TextStyle(
@@ -93,8 +94,6 @@ class _HomePageState extends State<HomePage> {
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
-            maxLines: 2, // Allow text to wrap to two lines if needed
-            overflow: TextOverflow.ellipsis, // Add ellipsis if text overflows
           ),
         ],
       ),
@@ -146,32 +145,63 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column( // Use a Column to hold the GridView and any other widgets below it
-          children: [
+        padding: const EdgeInsets.all(10.0), // Reduced overall padding for grid
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch children
+          children: <Widget>[
+            // Grid for Dashboard Items (2x2 layout)
             GridView.count(
-              shrinkWrap: true, // Important: allows GridView to take only needed space
-              physics: const NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
-              crossAxisCount: 2, // Two columns
-              crossAxisSpacing: 15, // Spacing between columns
-              mainAxisSpacing: 15, // Spacing between rows
-              childAspectRatio: 1.0, // Make the children square (width/height ratio)
+              shrinkWrap: true, // Make grid take only needed space
+              physics: const NeverScrollableScrollPhysics(), // Disable grid scrolling
+              crossAxisCount: 2, // 2 columns
+              crossAxisSpacing: 10, // Spacing between columns
+              mainAxisSpacing: 10, // Spacing between rows
+              childAspectRatio: 1.2, // Adjust aspect ratio for squarish look
               children: <Widget>[
-                // First Rectangle: Total Verifications (Green)
-                _buildDashboardRectangle('Total Verifications', Icons.check_circle_outline, primaryGreen),
-                // Second Rectangle: New Customers Onboarded (Blue)
-                _buildDashboardRectangle('New Customers Onboarded', Icons.person_add_alt_1, accentBlue),
-                // Third Rectangle: Pending Verifications (Green)
-                _buildDashboardRectangle('Pending Verifications', Icons.hourglass_empty, accentBlue),
-                // Fourth Rectangle: Avg. Processing Time (Blue)
-                _buildDashboardRectangle('Avg. Processing Time', Icons.timer, primaryGreen),
+                _buildDashboardGridItem('Total Verifications', primaryGreen, Icons.check_circle_outline),
+                _buildDashboardGridItem('New Customers Onboarded', accentBlue, Icons.group_add),
+                _buildDashboardGridItem('Pending Verifications', accentBlue, Icons.pending_actions),
+                _buildDashboardGridItem('Avg. Processing Time', primaryGreen, Icons.hourglass_empty),
               ],
             ),
-            const SizedBox(height: 20), // Space before the button
+            const SizedBox(height: 30), // Space after the grid
+
+            // New Button for Customers Screen
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0), // Padding to match grid alignment
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CustomersScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accentBlue, // Use accent blue for this button
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 5,
+                  ),
+                  child: Text(
+                    'Manage Customers',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10), // Space between buttons
           ],
         ),
       ),
-      // Persistent bottom navigation/button area
+      // Persistent bottom navigation/button area (Profile button)
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SizedBox(

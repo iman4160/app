@@ -69,17 +69,6 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
   // --- Customer Data Management ---
 
-  // Calculates age from a given birth date
-  int _calculateAge(DateTime birthDate) {
-    DateTime today = DateTime.now();
-    int age = today.year - birthDate.year;
-    if (today.month < birthDate.month ||
-        (today.month == birthDate.month && today.day < birthDate.day)) {
-      age--;
-    }
-    return age;
-  }
-
   // Adds a new customer to the list and saves
   void _addCustomer(Customer customer) {
     List<Customer> currentCustomers = List.from(_customers.value);
@@ -120,263 +109,24 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
   // Shows the form bottom sheet for registering or editing a customer
   void _showCustomerFormBottomSheet({Customer? customerToEdit}) {
-    // Form controllers
-    final _formKey = GlobalKey<FormState>();
-    final TextEditingController _firstNameController = TextEditingController(text: customerToEdit?.firstName);
-    final TextEditingController _middleNameController = TextEditingController(text: customerToEdit?.middleName);
-    final TextEditingController _lastNameController = TextEditingController(text: customerToEdit?.lastName);
-    final TextEditingController _emailController = TextEditingController(text: customerToEdit?.email);
-    final TextEditingController _phoneController = TextEditingController(text: customerToEdit?.phone);
-    final TextEditingController _addressController = TextEditingController(text: customerToEdit?.address);
-
-    String? _selectedGender = customerToEdit?.gender;
-    DateTime? _selectedBirthDate = customerToEdit?.birthDate;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true, // Allows sheet to take full height if needed
       backgroundColor: Colors.transparent, // To show custom shape
       builder: (context) {
-        return StatefulBuilder( // Use StatefulBuilder to manage state within the bottom sheet
-          builder: (BuildContext context, StateSetter setModalState) {
-            return Container(
-              height: MediaQuery.of(context).size.height * 0.9, // 90% of screen height
-              decoration: BoxDecoration(
-                color: Colors.grey[900], // Dark background for the sheet
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(25.0)),
-              ),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20, // Adjust padding for keyboard
-                ),
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          customerToEdit == null ? 'Register New Customer' : 'Edit Customer',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: primaryGreen,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // --- Form Fields ---
-                        _buildTextField(_firstNameController, 'First Name', Icons.person, validator: (value) => value!.isEmpty ? 'First Name is required' : null),
-                        _buildTextField(_middleNameController, 'Middle Name (Optional)', Icons.person_outline),
-                        _buildTextField(_lastNameController, 'Last Name', Icons.person, validator: (value) => value!.isEmpty ? 'Last Name is required' : null),
-                        _buildTextField(_emailController, 'Email', Icons.email, validator: (value) {
-                          if (value!.isEmpty) return 'Email is required';
-                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return 'Enter a valid email';
-                          return null;
-                        }),
-                        _buildTextField(_phoneController, 'Phone', Icons.phone, validator: (value) => value!.isEmpty ? 'Phone is required' : null, keyboardType: TextInputType.phone),
-                        _buildTextField(_addressController, 'Address', Icons.location_on, validator: (value) => value!.isEmpty ? 'Address is required' : null),
-
-                        // Gender Dropdown
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            color: inputFillColor,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: hintColor.withOpacity(0.3)),
-                          ),
-                          child: DropdownButtonFormField<String>(
-                            value: _selectedGender,
-                            dropdownColor: Colors.grey[800], // Darker background for dropdown list
-                            style: TextStyle(color: textColor),
-                            decoration: InputDecoration(
-                              labelText: 'Gender',
-                              labelStyle: TextStyle(color: hintColor),
-                              prefixIcon: Icon(Icons.transgender, color: primaryGreen), // Changed from male_female
-                              border: InputBorder.none, // No border, as container has it
-                            ),
-                            items: <String>['Male', 'Female', 'Other']
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setModalState(() {
-                                _selectedGender = newValue;
-                              });
-                            },
-                            validator: (value) => value == null ? 'Gender is required' : null,
-                          ),
-                        ),
-
-                        // Birth Date Picker
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          child: InkWell(
-                            onTap: () async {
-                              DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: _selectedBirthDate ?? DateTime.now().subtract(const Duration(days: 365 * 18)), // Default to 18 years ago
-                                firstDate: DateTime(1900),
-                                lastDate: DateTime.now(),
-                                builder: (context, child) {
-                                  return Theme(
-                                    data: ThemeData.dark().copyWith( // Dark theme for date picker
-                                      colorScheme: ColorScheme.dark(
-                                        primary: primaryGreen, // Accent color
-                                        onPrimary: Colors.white, // Text color on accent
-                                        surface: accentBlue, // Background color
-                                        onSurface: textColor, // Text color on background
-                                      ),
-                                      dialogBackgroundColor: Colors.grey[900],
-                                    ),
-                                    child: child!,
-                                  );
-                                },
-                              );
-                              if (pickedDate != null) {
-                                setModalState(() {
-                                  _selectedBirthDate = pickedDate;
-                                });
-                              }
-                            },
-                            child: InputDecorator(
-                              decoration: InputDecoration(
-                                labelText: 'Birth Date',
-                                labelStyle: TextStyle(color: hintColor),
-                                hintText: 'Select your birth date',
-                                hintStyle: TextStyle(color: hintColor),
-                                prefixIcon: Icon(Icons.calendar_today, color: primaryGreen),
-                                filled: true,
-                                fillColor: inputFillColor,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(color: primaryGreen, width: 2),
-                                ),
-                              ),
-                              child: Text(
-                                _selectedBirthDate == null
-                                    ? 'Select Date'
-                                    : DateFormat('dd/MM/yyyy').format(_selectedBirthDate!),
-                                style: TextStyle(color: textColor, fontSize: 16),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-
-                        // Submit Button
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate() && _selectedGender != null && _selectedBirthDate != null) {
-                                final int age = _calculateAge(_selectedBirthDate!);
-                                if (age < 18) {
-                                  _showSnackBar('Customer must be at least 18 years old.');
-                                  return;
-                                }
-
-                                final newCustomer = Customer(
-                                  id: customerToEdit?.id ?? _nextCustomerId.toString(), // Use existing ID or new
-                                  firstName: _firstNameController.text,
-                                  middleName: _middleNameController.text.isEmpty ? null : _middleNameController.text,
-                                  lastName: _lastNameController.text,
-                                  email: _emailController.text,
-                                  phone: _phoneController.text,
-                                  address: _addressController.text,
-                                  gender: _selectedGender!,
-                                  birthDate: _selectedBirthDate!,
-                                  age: age,
-                                );
-
-                                if (customerToEdit == null) {
-                                  _addCustomer(newCustomer);
-                                } else {
-                                  _updateCustomer(newCustomer);
-                                }
-                                Navigator.pop(context); // Close the bottom sheet
-                              } else {
-                                _showSnackBar('Please fill all required fields and select gender/birth date.');
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryGreen,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 5,
-                            ),
-                            child: Text(
-                              customerToEdit == null ? 'Register Customer' : 'Save Changes',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
+        return _CustomerForm(
+          customerToEdit: customerToEdit,
+          nextCustomerId: _nextCustomerId.toString(), // Pass auto-increment ID
+          onSubmit: (Customer customer) {
+            if (customerToEdit == null) {
+              _addCustomer(customer);
+            } else {
+              _updateCustomer(customer);
+            }
+            Navigator.pop(context); // Close the bottom sheet after submission
           },
         );
       },
-    ).whenComplete(() {
-      // Dispose controllers when the bottom sheet is closed
-      _firstNameController.dispose();
-      _middleNameController.dispose();
-      _lastNameController.dispose();
-      _emailController.dispose();
-      _phoneController.dispose();
-      _addressController.dispose();
-    });
-  }
-
-  // Helper for building TextFormFields consistently
-  Widget _buildTextField(
-      TextEditingController controller,
-      String labelText,
-      IconData icon, { // Changed to named optional parameters
-        String? Function(String?)? validator,
-        TextInputType keyboardType = TextInputType.text,
-      }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        style: TextStyle(color: textColor),
-        decoration: InputDecoration(
-          labelText: labelText,
-          labelStyle: TextStyle(color: hintColor),
-          prefixIcon: Icon(icon, color: primaryGreen),
-          filled: true,
-          fillColor: inputFillColor,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: primaryGreen, width: 2),
-          ),
-          errorStyle: TextStyle(color: Colors.redAccent),
-        ),
-        validator: validator,
-      ),
     );
   }
 
@@ -487,7 +237,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                       actions: [
                                         TextButton(
                                           onPressed: () => Navigator.pop(context),
-                                          child: Text('Cancel', style: TextStyle(color: primaryGreen)),
+                                          // Make text white
+                                          child: Text('Cancel', style: TextStyle(color: textColor)),
                                         ),
                                         ElevatedButton(
                                           onPressed: () {
@@ -497,6 +248,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.red, // Red for delete action
                                           ),
+                                          // Make text white
                                           child: Text('Delete', style: TextStyle(color: textColor)),
                                         ),
                                       ],
@@ -516,6 +268,316 @@ class _CustomersScreenState extends State<CustomersScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+// --- _CustomerForm StatefulWidget for handling the customer registration/edit form ---
+class _CustomerForm extends StatefulWidget {
+  final Customer? customerToEdit;
+  final String nextCustomerId;
+  final Function(Customer) onSubmit; // Callback to return the submitted customer
+
+  const _CustomerForm({
+    super.key,
+    this.customerToEdit,
+    required this.nextCustomerId,
+    required this.onSubmit,
+  });
+
+  @override
+  State<_CustomerForm> createState() => _CustomerFormState();
+}
+
+class _CustomerFormState extends State<_CustomerForm> {
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController _firstNameController;
+  late TextEditingController _middleNameController;
+  late TextEditingController _lastNameController;
+  late TextEditingController _emailController;
+  late TextEditingController _phoneController;
+  late TextEditingController _addressController;
+
+  String? _selectedGender;
+  DateTime? _selectedBirthDate;
+
+  final Color primaryGreen = const Color(0xFF1b9349);
+  final Color accentBlue = const Color(0xFF3753a2);
+  final Color textColor = Colors.white;
+  final Color hintColor = Colors.white70;
+  final Color inputFillColor = Colors.white.withOpacity(0.1);
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers with existing data if editing, otherwise empty
+    _firstNameController = TextEditingController(text: widget.customerToEdit?.firstName);
+    _middleNameController = TextEditingController(text: widget.customerToEdit?.middleName);
+    _lastNameController = TextEditingController(text: widget.customerToEdit?.lastName);
+    _emailController = TextEditingController(text: widget.customerToEdit?.email);
+    _phoneController = TextEditingController(text: widget.customerToEdit?.phone);
+    _addressController = TextEditingController(text: widget.customerToEdit?.address);
+
+    _selectedGender = widget.customerToEdit?.gender;
+    _selectedBirthDate = widget.customerToEdit?.birthDate;
+  }
+
+  @override
+  void dispose() {
+    // Dispose all controllers to prevent memory leaks
+    _firstNameController.dispose();
+    _middleNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
+
+  // Calculates age from a given birth date
+  int _calculateAge(DateTime birthDate) {
+    DateTime today = DateTime.now();
+    int age = today.year - birthDate.year;
+    if (today.month < birthDate.month ||
+        (today.month == birthDate.month && today.day < birthDate.day)) {
+      age--;
+    }
+    return age;
+  }
+
+  // Helper for building TextFormFields consistently
+  Widget _buildTextField(
+      TextEditingController controller,
+      String labelText,
+      IconData icon, {
+        String? Function(String?)? validator,
+        TextInputType keyboardType = TextInputType.text,
+      }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        style: TextStyle(color: textColor),
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: TextStyle(color: hintColor),
+          prefixIcon: Icon(icon, color: primaryGreen),
+          filled: true,
+          fillColor: inputFillColor,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: primaryGreen, width: 2),
+          ),
+          errorStyle: TextStyle(color: Colors.redAccent),
+        ),
+        validator: validator,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.9, // 90% of screen height
+      decoration: BoxDecoration(
+        color: Colors.grey[900], // Dark background for the sheet
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20, // Adjust padding for keyboard
+        ),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  widget.customerToEdit == null ? 'Register New Customer' : 'Edit Customer',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: primaryGreen,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // --- Form Fields ---
+                _buildTextField(_firstNameController, 'First Name', Icons.person, validator: (value) => value!.isEmpty ? 'First Name is required' : null),
+                _buildTextField(_middleNameController, 'Middle Name (Optional)', Icons.person_outline),
+                _buildTextField(_lastNameController, 'Last Name', Icons.person, validator: (value) => value!.isEmpty ? 'Last Name is required' : null),
+                _buildTextField(_emailController, 'Email', Icons.email, validator: (value) {
+                  if (value!.isEmpty) return 'Email is required';
+                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return 'Enter a valid email';
+                  return null;
+                }),
+                _buildTextField(_phoneController, 'Phone', Icons.phone, validator: (value) => value!.isEmpty ? 'Phone is required' : null, keyboardType: TextInputType.phone),
+                _buildTextField(_addressController, 'Address', Icons.location_on, validator: (value) => value!.isEmpty ? 'Address is required' : null),
+
+                // Gender Dropdown
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: inputFillColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: hintColor.withOpacity(0.3)),
+                  ),
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedGender,
+                    dropdownColor: Colors.grey[800], // Darker background for dropdown list
+                    style: TextStyle(color: textColor),
+                    decoration: InputDecoration(
+                      labelText: 'Gender',
+                      labelStyle: TextStyle(color: hintColor),
+                      prefixIcon: Icon(Icons.transgender, color: primaryGreen), // Changed from male_female
+                      border: InputBorder.none, // No border, as container has it
+                    ),
+                    items: <String>['Male', 'Female', 'Other']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedGender = newValue;
+                      });
+                    },
+                    validator: (value) => value == null ? 'Gender is required' : null,
+                  ),
+                ),
+
+                // Birth Date Picker
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  child: InkWell(
+                    onTap: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: _selectedBirthDate ?? DateTime.now().subtract(const Duration(days: 365 * 18)), // Default to 18 years ago
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime.now(),
+                        builder: (context, child) {
+                          return Theme(
+                            data: ThemeData.dark().copyWith( // Dark theme for date picker
+                              colorScheme: ColorScheme.dark(
+                                primary: primaryGreen, // Accent color
+                                onPrimary: Colors.white, // Text color on primary (e.g., current year, selected date number)
+                                surface: accentBlue, // Background color of the picker surface
+                                onSurface: textColor, // Text color on surface (e.g., day numbers, month/year headers, "Select date" label)
+                              ),
+                              dialogBackgroundColor: Colors.grey[900],
+                              // Explicitly set TextButtonTheme for Cancel/OK buttons in the DatePicker
+                              textButtonTheme: TextButtonThemeData(
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.white, // This makes the "Cancel" and "OK" text white
+                                ),
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (pickedDate != null) {
+                        setState(() {
+                          _selectedBirthDate = pickedDate;
+                        });
+                      }
+                    },
+                    child: InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: 'Birth Date',
+                        labelStyle: TextStyle(color: hintColor),
+                        hintText: 'Select your birth date',
+                        hintStyle: TextStyle(color: hintColor),
+                        prefixIcon: Icon(Icons.calendar_today, color: primaryGreen),
+                        filled: true,
+                        fillColor: inputFillColor,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: primaryGreen, width: 2),
+                        ),
+                      ),
+                      child: Text(
+                        _selectedBirthDate == null
+                            ? 'Select Date'
+                            : DateFormat('dd/MM/yyyy').format(_selectedBirthDate!),
+                        style: TextStyle(color: textColor, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+
+                // Submit Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate() && _selectedGender != null && _selectedBirthDate != null) {
+                        final int age = _calculateAge(_selectedBirthDate!);
+                        if (age < 18) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Customer must be at least 18 years old.')),
+                          );
+                          return;
+                        }
+
+                        final newCustomer = Customer(
+                          id: widget.customerToEdit?.id ?? widget.nextCustomerId, // Use existing ID or new
+                          firstName: _firstNameController.text,
+                          middleName: _middleNameController.text.isEmpty ? null : _middleNameController.text,
+                          lastName: _lastNameController.text,
+                          email: _emailController.text,
+                          phone: _phoneController.text,
+                          address: _addressController.text,
+                          gender: _selectedGender!,
+                          birthDate: _selectedBirthDate!,
+                          age: age,
+                        );
+
+                        widget.onSubmit(newCustomer); // Call the callback to submit
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Please fill all required fields and select gender/birth date.')),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryGreen,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 5,
+                    ),
+                    child: Text(
+                      widget.customerToEdit == null ? 'Register Customer' : 'Save Changes',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
