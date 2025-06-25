@@ -12,6 +12,18 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen width for responsiveness
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double horizontalPadding = screenWidth * 0.06;
+    final double profileImageRadius = screenWidth * 0.15; // 15% of screen width for radius
+    final double profileIconSize = screenWidth * 0.2; // Adjusted to be bigger than radius
+    final double nameFontSize = screenWidth * 0.055;
+    final double headingFontSize = screenWidth * 0.05;
+    final double infoLabelFontSize = screenWidth * 0.04;
+    final double infoValueFontSize = screenWidth * 0.04;
+    final double buttonFontSize = screenWidth * 0.045;
+
+
     return Scaffold(
       backgroundColor: Colors.black87, // Consistent dark background
       appBar: AppBar(
@@ -24,36 +36,34 @@ class ProfilePage extends StatelessWidget {
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center, // Center contents horizontally
           children: <Widget>[
-            const SizedBox(height: 30),
+            SizedBox(height: screenWidth * 0.06),
 
             // Circular Profile Picture
             CircleAvatar(
-              radius: 60, // Size of the circle
-              backgroundColor: primaryGreen.withOpacity(0.8), // A slightly transparent green for background
+              radius: profileImageRadius, // Responsive size
+              backgroundColor: primaryGreen.withOpacity(0.8),
               child: Icon(
                 Icons.person, // Placeholder icon
-                size: 80,
-                color: textColor.withOpacity(0.9), // Slightly faded white icon
+                size: profileIconSize, // Responsive icon size
+                color: textColor.withOpacity(0.9),
               ),
-              // You can add a background image here later:
-              // backgroundImage: NetworkImage('https://placehold.co/120x120/000000/FFFFFF?text=P'),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: screenWidth * 0.04),
 
             // User's Full Name
             Text(
-              'User Name', // Placeholder Name
+              'Ahmad Smith', // Placeholder Name
               style: TextStyle(
-                fontSize: 22, // Increased from 16 for better visibility as a main name
+                fontSize: nameFontSize, // Responsive font size
                 fontWeight: FontWeight.bold,
                 color: textColor,
               ),
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: screenWidth * 0.08),
 
             // User Info Section Heading
             Align(
@@ -61,20 +71,20 @@ class ProfilePage extends StatelessWidget {
               child: Text(
                 'User Info',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: headingFontSize, // Responsive font size
                   fontWeight: FontWeight.bold,
-                  color: primaryGreen, // Green for subheading
+                  color: primaryGreen,
                 ),
               ),
             ),
             const Divider(color: Colors.white38, thickness: 1, height: 20), // Divider for separation
 
             // User Info Details (using a Column with Rows for alignment)
-            _buildInfoRow('Name', 'User Name'), // Placeholder
-            _buildInfoRow('Email', 'user.name@example.com'), // Placeholder
-            _buildInfoRow('D.O.B', '01/01/1990'), // Placeholder
-            _buildInfoRow('Phone Number', '+1 555-123-4567'), // Placeholder
-            const SizedBox(height: 50), // Increased space before the button
+            _buildInfoRow('Name', 'Ahmad Smith', infoLabelFontSize, infoValueFontSize), // Placeholder
+            _buildInfoRow('Email', 'ahmad.smith@example.com', infoLabelFontSize, infoValueFontSize), // Placeholder
+            _buildInfoRow('D.O.B', '01/01/1990', infoLabelFontSize, infoValueFontSize), // Placeholder
+            _buildInfoRow('Phone Number', '+1 555-123-4567', infoLabelFontSize, infoValueFontSize), // Placeholder
+            SizedBox(height: screenWidth * 0.1), // Responsive space before the button
 
             // Log Out Button
             SizedBox(
@@ -90,7 +100,7 @@ class ProfilePage extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accentBlue, // Use accent blue for the logout button
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04), // Responsive padding
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -99,7 +109,7 @@ class ProfilePage extends StatelessWidget {
                 child: Text(
                   'Log Out',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: buttonFontSize, // Responsive font size
                     fontWeight: FontWeight.bold,
                     color: textColor, // White text on blue button
                   ),
@@ -112,19 +122,19 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // Helper widget to build a row for information display
-  Widget _buildInfoRow(String label, String value) {
+  // Helper widget to build a row for information display (responsive font sizes)
+  Widget _buildInfoRow(String label, String value, double labelFontSize, double valueFontSize) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120, // Fixed width for labels for alignment
+            width: 120, // Fixed width for labels for alignment - can be made responsive
             child: Text(
               '$label:',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: labelFontSize, // Responsive font size
                 fontWeight: FontWeight.bold,
                 color: hintColor, // Use hint color for labels
               ),
@@ -134,7 +144,7 @@ class ProfilePage extends StatelessWidget {
             child: Text(
               value,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: valueFontSize, // Responsive font size
                 color: textColor,
               ),
             ),
@@ -144,3 +154,4 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
+

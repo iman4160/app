@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Inter',
       ),
       home: const SignInPage(),
+      debugShowCheckedModeBanner: false, // <--- ADD THIS LINE TO REMOVE DEBUG BANNER
     );
   }
 }

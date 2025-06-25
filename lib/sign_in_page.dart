@@ -29,7 +29,6 @@ class _SignInPageState extends State<SignInPage> {
   final Color inputFillColor = Colors.white.withOpacity(0.1);
 
   // Regular expression for basic email validation
-  // This is a simple regex; for very strict validation, a more complex one might be needed.
   final RegExp emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
 
   @override
@@ -77,55 +76,73 @@ class _SignInPageState extends State<SignInPage> {
     // Determine if the Sign In button should be enabled
     final bool isSignInButtonEnabled = _isEmailValid && _isPasswordNotEmpty;
 
+    // Get screen width for responsiveness
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double horizontalPadding = screenWidth * 0.06; // 6% of screen width
+    final double iconSize = screenWidth * 0.2; // 20% of screen width for icon
+    final double titleFontSize = screenWidth * 0.07; // Responsive title font size
+    final double subtitleFontSize = screenWidth * 0.04; // Responsive subtitle font size
+    final double inputFontSize = screenWidth * 0.045; // Responsive input font size
+    final double buttonFontSize = screenWidth * 0.05; // Responsive button font size
+
+
     return Scaffold(
-      // The AppBar has been removed from here
+      appBar: AppBar(
+        title: Text(
+          'Sign In',
+          style: TextStyle(color: textColor),
+        ),
+        backgroundColor: accentBlue,
+        centerTitle: true,
+        elevation: 0,
+      ),
       backgroundColor: Colors.black,
 
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const SizedBox(height: 40),
+              SizedBox(height: screenWidth * 0.08), // Responsive space from app bar
 
               Icon(
                 Icons.lock_outline,
-                size: 100,
+                size: iconSize,
                 color: primaryGreen,
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: screenWidth * 0.06),
 
               Text(
                 'Welcome Back!',
                 style: TextStyle(
-                  fontSize: 28,
+                  fontSize: titleFontSize,
                   fontWeight: FontWeight.bold,
                   color: textColor,
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: screenWidth * 0.02),
               Text(
                 'Sign in to continue to your account',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: subtitleFontSize,
                   color: hintColor,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: screenWidth * 0.08),
 
               // Email Input Field with Validation
               TextField(
-                controller: _emailController,
+                controller: _emailController, // Assign controller
                 keyboardType: TextInputType.emailAddress,
-                style: TextStyle(color: textColor),
-                onChanged: (text) => _validateForm(), // Call master validation on change
+                style: TextStyle(color: textColor, fontSize: inputFontSize), // Responsive font size
+                onChanged: (text) => _validateForm(), // Validate on text change
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: TextStyle(color: hintColor),
+                  labelStyle: TextStyle(color: hintColor, fontSize: inputFontSize),
                   hintText: 'Enter your email',
-                  hintStyle: TextStyle(color: hintColor),
+                  hintStyle: TextStyle(color: hintColor, fontSize: inputFontSize),
                   prefixIcon: Icon(Icons.email, color: primaryGreen),
                   filled: true,
                   fillColor: inputFillColor,
@@ -141,22 +158,22 @@ class _SignInPageState extends State<SignInPage> {
                   errorText: _emailController.text.isNotEmpty && !_isEmailValid
                       ? 'Please enter a valid email'
                       : null,
-                  errorStyle: TextStyle(color: Colors.redAccent),
+                  errorStyle: TextStyle(color: Colors.redAccent, fontSize: subtitleFontSize), // Responsive error font size
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: screenWidth * 0.04),
 
               // Password Input Field with Visibility Toggle and Validation Check
               TextField(
-                controller: _passwordController,
-                obscureText: !_passwordVisible,
-                style: TextStyle(color: textColor),
-                onChanged: (text) => _validateForm(), // Call master validation on change
+                controller: _passwordController, // Assign controller
+                obscureText: !_passwordVisible, // Toggles based on state
+                style: TextStyle(color: textColor, fontSize: inputFontSize), // Responsive font size
+                onChanged: (text) => _validateForm(), // Check if not empty on text change
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  labelStyle: TextStyle(color: hintColor),
+                  labelStyle: TextStyle(color: hintColor, fontSize: inputFontSize),
                   hintText: 'Enter your password',
-                  hintStyle: TextStyle(color: hintColor),
+                  hintStyle: TextStyle(color: hintColor, fontSize: inputFontSize),
                   prefixIcon: Icon(Icons.lock, color: primaryGreen),
                   filled: true,
                   fillColor: inputFillColor,
@@ -170,8 +187,9 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
+                      // Choose the icon based on _passwordVisible state
                       _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                      color: hintColor,
+                      color: hintColor, // Use hint color for the icon
                     ),
                     onPressed: () {
                       setState(() {
@@ -181,11 +199,11 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: screenWidth * 0.06),
 
               // Sign In Button (Enabled/Disabled based on validation)
               SizedBox(
-                width: double.infinity,
+                width: double.infinity, // Make button fill width
                 child: ElevatedButton(
                   // onPressed is null when button is disabled
                   onPressed: isSignInButtonEnabled ? () {
@@ -196,26 +214,24 @@ class _SignInPageState extends State<SignInPage> {
                     );
                   } : null, // Set to null to disable the button
                   style: ElevatedButton.styleFrom(
-                    // Change background color to grey when disabled
-                    backgroundColor: isSignInButtonEnabled ? primaryGreen : Colors.grey,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: isSignInButtonEnabled ? primaryGreen : Colors.grey, // Grey when disabled
+                    padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04), // Responsive padding
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12), // Rounded corners
                     ),
-                    elevation: 5,
+                    elevation: 5, // Add some shadow
                   ),
                   child: Text(
                     'Sign In',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: buttonFontSize, // Responsive font size
                       fontWeight: FontWeight.bold,
-                      // Text color for disabled button can also be adjusted if needed
-                      color: isSignInButtonEnabled ? textColor : textColor.withOpacity(0.6),
+                      color: isSignInButtonEnabled ? textColor : textColor.withOpacity(0.6), // Text color for disabled button
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: screenWidth * 0.04),
 
               // Forgot Password link
               TextButton(
@@ -228,12 +244,12 @@ class _SignInPageState extends State<SignInPage> {
                 child: Text(
                   'Forgot Password?',
                   style: TextStyle(
-                    color: primaryGreen,
-                    fontSize: 16,
+                    color: primaryGreen, // Use primary green for links
+                    fontSize: subtitleFontSize, // Responsive font size
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: screenWidth * 0.04),
 
               // Sign Up Link
               Row(
@@ -241,7 +257,7 @@ class _SignInPageState extends State<SignInPage> {
                 children: [
                   Text(
                     "Don't have an account? ",
-                    style: TextStyle(color: hintColor),
+                    style: TextStyle(color: hintColor, fontSize: subtitleFontSize), // Responsive font size
                   ),
                   TextButton(
                     onPressed: () {
@@ -253,7 +269,7 @@ class _SignInPageState extends State<SignInPage> {
                     child: Text(
                       'Sign Up',
                       style: TextStyle(
-                        fontSize: 16.0,
+                        fontSize: subtitleFontSize, // Responsive font size
                         fontWeight: FontWeight.bold,
                         color: primaryGreen,
                       ),

@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Widget to create a single dashboard grid item (modified to include an icon)
-  Widget _buildDashboardGridItem(String title, Color color, IconData icon) {
+  Widget _buildDashboardGridItem(String title, Color color, IconData icon, double fontSize, double iconSize) {
     return Container(
       margin: const EdgeInsets.all(8), // Margin around each grid item
       padding: const EdgeInsets.all(16), // Padding inside the item
@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           Icon(
             icon,
-            size: 40, // Size for the icon
+            size: iconSize, // Responsive icon size
             color: textColor, // White icon for contrast
           ),
           const SizedBox(height: 8), // Space between icon and text
@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> {
             title,
             style: TextStyle(
               color: textColor, // White text for contrast
-              fontSize: 18, // Slightly smaller font for grid items
+              fontSize: fontSize, // Responsive font size
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
@@ -102,6 +102,18 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions for responsiveness
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+
+    // Adjust font sizes and padding based on screen width
+    final double titleFontSize = screenWidth * 0.055; // For "Softnet Technologies"
+    final double subtitleFontSize = screenWidth * 0.04; // For "Dashboard"
+    final double clockFontSize = screenWidth * 0.045; // For live clock
+    final double gridItemFontSize = screenWidth * 0.045; // For text in grid items
+    final double gridIconSize = screenWidth * 0.08; // For icons in grid items
+    final double buttonFontSize = screenWidth * 0.045; // For button text
+
     return Scaffold(
       backgroundColor: Colors.black87, // Dark background for the page
       appBar: AppBar(
@@ -114,7 +126,7 @@ class _HomePageState extends State<HomePage> {
               'Softnet Technologies',
               style: TextStyle(
                 color: textColor,
-                fontSize: 22,
+                fontSize: titleFontSize, // Responsive font size
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -122,7 +134,7 @@ class _HomePageState extends State<HomePage> {
               'Dashboard',
               style: TextStyle(
                 color: textColor.withOpacity(0.8),
-                fontSize: 16,
+                fontSize: subtitleFontSize, // Responsive font size
               ),
             ),
           ],
@@ -130,13 +142,13 @@ class _HomePageState extends State<HomePage> {
         actions: [
           // Live Clock in the top right corner
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: EdgeInsets.only(right: screenWidth * 0.04), // Responsive padding
             child: Center(
               child: Text(
                 _timeString, // Display the current time
                 style: TextStyle(
                   color: textColor,
-                  fontSize: 18,
+                  fontSize: clockFontSize, // Responsive font size
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -145,7 +157,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(10.0), // Reduced overall padding for grid
+        padding: EdgeInsets.all(screenWidth * 0.03), // Responsive overall padding for grid
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch children
           children: <Widget>[
@@ -153,22 +165,22 @@ class _HomePageState extends State<HomePage> {
             GridView.count(
               shrinkWrap: true, // Make grid take only needed space
               physics: const NeverScrollableScrollPhysics(), // Disable grid scrolling
-              crossAxisCount: 2, // 2 columns
-              crossAxisSpacing: 10, // Spacing between columns
-              mainAxisSpacing: 10, // Spacing between rows
-              childAspectRatio: 1.2, // Adjust aspect ratio for squarish look
+              crossAxisCount: screenWidth > 600 ? 4 : 2, // 2 columns on small screens, 4 on larger
+              crossAxisSpacing: screenWidth * 0.025, // Responsive spacing between columns
+              mainAxisSpacing: screenWidth * 0.025, // Responsive spacing between rows
+              childAspectRatio: 1.2, // Maintain aspect ratio for squarish look
               children: <Widget>[
-                _buildDashboardGridItem('Total Verifications', primaryGreen, Icons.check_circle_outline),
-                _buildDashboardGridItem('New Customers Onboarded', accentBlue, Icons.group_add),
-                _buildDashboardGridItem('Pending Verifications', accentBlue, Icons.pending_actions),
-                _buildDashboardGridItem('Avg. Processing Time', primaryGreen, Icons.hourglass_empty),
+                _buildDashboardGridItem('Total Verifications', primaryGreen, Icons.check_circle_outline, gridItemFontSize, gridIconSize),
+                _buildDashboardGridItem('New Customers Onboarded', accentBlue, Icons.group_add, gridItemFontSize, gridIconSize),
+                _buildDashboardGridItem('Pending Verifications', accentBlue, Icons.pending_actions, gridItemFontSize, gridIconSize),
+                _buildDashboardGridItem('Avg. Processing Time', primaryGreen, Icons.hourglass_empty, gridItemFontSize, gridIconSize),
               ],
             ),
-            const SizedBox(height: 30), // Space after the grid
+            SizedBox(height: screenWidth * 0.06), // Responsive space after the grid
 
             // New Button for Customers Screen
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0), // Padding to match grid alignment
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.025), // Padding to match grid alignment
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -180,7 +192,7 @@ class _HomePageState extends State<HomePage> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: accentBlue, // Use accent blue for this button
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04), // Responsive padding
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -189,7 +201,7 @@ class _HomePageState extends State<HomePage> {
                   child: Text(
                     'Manage Customers',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: buttonFontSize, // Responsive font size
                       fontWeight: FontWeight.bold,
                       color: textColor,
                     ),

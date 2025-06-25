@@ -132,6 +132,13 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen width for responsiveness
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double buttonFontSize = screenWidth * 0.045; // Responsive button font size
+    final double tableHeaderFontSize = screenWidth * 0.038; // Responsive table header font size
+    final double tableDataFontSize = screenWidth * 0.035; // Responsive table data font size
+    final double iconButtonSize = screenWidth * 0.05; // Responsive size for edit/delete icons
+
     return Scaffold(
       backgroundColor: Colors.black87,
       appBar: AppBar(
@@ -149,7 +156,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(screenWidth * 0.04), // Responsive padding
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -157,11 +164,11 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     icon: Icon(Icons.person_add, color: textColor),
                     label: Text(
                       'Register Customer',
-                      style: TextStyle(color: textColor, fontSize: 18),
+                      style: TextStyle(color: textColor, fontSize: buttonFontSize),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryGreen,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      padding: EdgeInsets.symmetric(vertical: screenWidth * 0.035),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -176,13 +183,13 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   child: Text(
                     'No customers registered yet. Click "Register Customer" to add one.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: hintColor, fontSize: 16),
+                    style: TextStyle(color: hintColor, fontSize: buttonFontSize),
                   ),
                 )
                     : SingleChildScrollView(
                   scrollDirection: Axis.horizontal, // Allows horizontal scrolling for wide table
                   child: DataTable(
-                    columnSpacing: 20, // Adjust spacing between columns
+                    columnSpacing: screenWidth * 0.05, // Responsive column spacing
                     dataRowMinHeight: 50,
                     dataRowMaxHeight: 60,
                     headingRowColor: MaterialStateProperty.resolveWith((states) => accentBlue.withOpacity(0.8)), // Header color
@@ -190,11 +197,11 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     headingTextStyle: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: textColor,
-                      fontSize: 15,
+                      fontSize: tableHeaderFontSize, // Responsive font size
                     ),
                     dataTextStyle: TextStyle(
                       color: textColor,
-                      fontSize: 14,
+                      fontSize: tableDataFontSize, // Responsive font size
                     ),
                     columns: const <DataColumn>[
                       DataColumn(label: Text('Customer ID')),
@@ -220,25 +227,24 @@ class _CustomersScreenState extends State<CustomersScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: Icon(Icons.edit, color: primaryGreen),
+                                icon: Icon(Icons.edit, color: primaryGreen, size: iconButtonSize), // Responsive icon size
                                 onPressed: () => _showCustomerFormBottomSheet(customerToEdit: customer),
                                 tooltip: 'Edit Customer',
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete, color: Colors.redAccent),
+                                icon: Icon(Icons.delete, color: Colors.redAccent, size: iconButtonSize), // Responsive icon size
                                 onPressed: () {
                                   // Show confirmation dialog before deleting
                                   showDialog(
                                     context: context,
                                     builder: (context) => AlertDialog(
                                       backgroundColor: Colors.grey[900], // Dark background for dialog
-                                      title: Text('Delete Customer', style: TextStyle(color: textColor)),
-                                      content: Text('Are you sure you want to delete ${customer.firstName} ${customer.lastName}?', style: TextStyle(color: hintColor)),
+                                      title: Text('Delete Customer', style: TextStyle(color: textColor, fontSize: buttonFontSize)), // Responsive font size
+                                      content: Text('Are you sure you want to delete ${customer.firstName} ${customer.lastName}?', style: TextStyle(color: hintColor, fontSize: tableDataFontSize)), // Responsive font size
                                       actions: [
                                         TextButton(
                                           onPressed: () => Navigator.pop(context),
-                                          // Make text white
-                                          child: Text('Cancel', style: TextStyle(color: textColor)),
+                                          child: Text('Cancel', style: TextStyle(color: textColor, fontSize: tableDataFontSize)), // Responsive font size
                                         ),
                                         ElevatedButton(
                                           onPressed: () {
@@ -248,8 +254,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.red, // Red for delete action
                                           ),
-                                          // Make text white
-                                          child: Text('Delete', style: TextStyle(color: textColor)),
+                                          child: Text('Delete', style: TextStyle(color: textColor, fontSize: tableDataFontSize)), // Responsive font size
                                         ),
                                       ],
                                     ),
@@ -354,15 +359,19 @@ class _CustomerFormState extends State<_CustomerForm> {
         String? Function(String?)? validator,
         TextInputType keyboardType = TextInputType.text,
       }) {
+    // Get screen width for responsiveness
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double inputFontSize = screenWidth * 0.045; // Responsive font size
+
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
+      margin: EdgeInsets.symmetric(vertical: screenWidth * 0.025), // Responsive margin
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
-        style: TextStyle(color: textColor),
+        style: TextStyle(color: textColor, fontSize: inputFontSize),
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: TextStyle(color: hintColor),
+          labelStyle: TextStyle(color: hintColor, fontSize: inputFontSize),
           prefixIcon: Icon(icon, color: primaryGreen),
           filled: true,
           fillColor: inputFillColor,
@@ -374,7 +383,7 @@ class _CustomerFormState extends State<_CustomerForm> {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: primaryGreen, width: 2),
           ),
-          errorStyle: TextStyle(color: Colors.redAccent),
+          errorStyle: TextStyle(color: Colors.redAccent, fontSize: screenWidth * 0.035), // Responsive error font size
         ),
         validator: validator,
       ),
@@ -383,6 +392,13 @@ class _CustomerFormState extends State<_CustomerForm> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen width for responsiveness
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double formTitleFontSize = screenWidth * 0.06; // Responsive form title font size
+    final double buttonFontSize = screenWidth * 0.045; // Responsive button font size
+    final double infoFontSize = screenWidth * 0.04; // For date text etc.
+
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.9, // 90% of screen height
       decoration: BoxDecoration(
@@ -391,7 +407,7 @@ class _CustomerFormState extends State<_CustomerForm> {
       ),
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-          20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20, // Adjust padding for keyboard
+          screenWidth * 0.05, screenWidth * 0.05, screenWidth * 0.05, MediaQuery.of(context).viewInsets.bottom + screenWidth * 0.05, // Adjust padding for keyboard
         ),
         child: SingleChildScrollView(
           child: Form(
@@ -402,7 +418,7 @@ class _CustomerFormState extends State<_CustomerForm> {
                 Text(
                   widget.customerToEdit == null ? 'Register New Customer' : 'Edit Customer',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: formTitleFontSize, // Responsive font size
                     fontWeight: FontWeight.bold,
                     color: primaryGreen,
                   ),
@@ -423,7 +439,7 @@ class _CustomerFormState extends State<_CustomerForm> {
 
                 // Gender Dropdown
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  margin: EdgeInsets.symmetric(vertical: screenWidth * 0.025),
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     color: inputFillColor,
@@ -433,10 +449,10 @@ class _CustomerFormState extends State<_CustomerForm> {
                   child: DropdownButtonFormField<String>(
                     value: _selectedGender,
                     dropdownColor: Colors.grey[800], // Darker background for dropdown list
-                    style: TextStyle(color: textColor),
+                    style: TextStyle(color: textColor, fontSize: infoFontSize), // Responsive font size
                     decoration: InputDecoration(
                       labelText: 'Gender',
-                      labelStyle: TextStyle(color: hintColor),
+                      labelStyle: TextStyle(color: hintColor, fontSize: infoFontSize),
                       prefixIcon: Icon(Icons.transgender, color: primaryGreen), // Changed from male_female
                       border: InputBorder.none, // No border, as container has it
                     ),
@@ -458,7 +474,7 @@ class _CustomerFormState extends State<_CustomerForm> {
 
                 // Birth Date Picker
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  margin: EdgeInsets.symmetric(vertical: screenWidth * 0.025),
                   child: InkWell(
                     onTap: () async {
                       DateTime? pickedDate = await showDatePicker(
@@ -496,9 +512,9 @@ class _CustomerFormState extends State<_CustomerForm> {
                     child: InputDecorator(
                       decoration: InputDecoration(
                         labelText: 'Birth Date',
-                        labelStyle: TextStyle(color: hintColor),
+                        labelStyle: TextStyle(color: hintColor, fontSize: infoFontSize),
                         hintText: 'Select your birth date',
-                        hintStyle: TextStyle(color: hintColor),
+                        hintStyle: TextStyle(color: hintColor, fontSize: infoFontSize),
                         prefixIcon: Icon(Icons.calendar_today, color: primaryGreen),
                         filled: true,
                         fillColor: inputFillColor,
@@ -515,7 +531,7 @@ class _CustomerFormState extends State<_CustomerForm> {
                         _selectedBirthDate == null
                             ? 'Select Date'
                             : DateFormat('dd/MM/yyyy').format(_selectedBirthDate!),
-                        style: TextStyle(color: textColor, fontSize: 16),
+                        style: TextStyle(color: textColor, fontSize: infoFontSize),
                       ),
                     ),
                   ),
@@ -558,7 +574,7 @@ class _CustomerFormState extends State<_CustomerForm> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryGreen,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -567,7 +583,7 @@ class _CustomerFormState extends State<_CustomerForm> {
                     child: Text(
                       widget.customerToEdit == null ? 'Register Customer' : 'Save Changes',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: buttonFontSize, // Responsive font size
                         fontWeight: FontWeight.bold,
                         color: textColor,
                       ),
